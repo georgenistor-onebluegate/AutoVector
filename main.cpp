@@ -13,7 +13,7 @@ int main()
 
     av.ChangePropagationBySize(5); //append just 5 new elements with each re-size
 
-    for (int i = 50; i <= 70; ++i) {
+    for (int i = 50; i < 70; ++i) {
         av.Add(i);
     }
 
