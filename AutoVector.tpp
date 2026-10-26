@@ -25,7 +25,7 @@ void AutoVector<T>::Initialize(std::size_t size)
     current_bufferSize = size;
     current_index = 0;
     elements_total = 0;
-    size_propagation = 5;
+    size_propagation = 0;
     singleBuffer = true;
 
     if (size == 0)
@@ -67,7 +67,7 @@ void AutoVector<T>::Add(const T& element)
             throw std::logic_error("Cannot grow a zero-sized buffer");
         }
 
-        current_bufferSize = last_buffer_size + increment;
+        current_bufferSize = increment;
 
         //Create a new buffer by custom_propagation_size after calling ChangePropagationBySize
         //Set back default behavior by calling ChangePropagationBySize(0)
