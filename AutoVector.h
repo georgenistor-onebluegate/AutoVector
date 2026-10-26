@@ -21,6 +21,7 @@ private:
     std::size_t size_propagation;
     std::size_t current_index;
     std::size_t elements_total;
+    std::size_t custom_propagation_size;
     bool singleBuffer;
 
 public:
@@ -29,6 +30,8 @@ public:
 
     // Create the first buffer. Calling Initialize again resets the contents.
     void Initialize(std::size_t size);
+
+    void ChangePropagationBySize(size_t size);
 
     // Append an element to the AutoVector.
     void Add(const T& element);

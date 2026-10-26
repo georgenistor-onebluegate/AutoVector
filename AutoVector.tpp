@@ -8,10 +8,11 @@
 template <typename T>
 AutoVector<T>::AutoVector()
     : current_bufferSize(0),
-      size_propagation(0),
-      current_index(0),
-      elements_total(0),
-      singleBuffer(true)
+    size_propagation(0),
+    current_index(0),
+    elements_total(0),
+    custom_propagation_size(0),
+    singleBuffer(true)
 {
 }
 
@@ -34,6 +35,12 @@ void AutoVector<T>::Initialize(std::size_t size)
 
     buffers.push_back(std::make_unique<Buffer<T>>(size));
     sizes.push_back(size);
+}
+
+template <typename T>
+void AutoVector<T>::ChangePropagationBySize(size_t size)
+{
+    custom_propagation_size = size;
 }
 
 template <typename T>
@@ -61,9 +68,13 @@ void AutoVector<T>::Add(const T& element)
         }
 
         current_bufferSize = last_buffer_size + increment;
+
+        //Create a new buffer by custom_propagation_size after calling ChangePropagationBySize
+        //Set back default behavior by calling ChangePropagationBySize(0)
+        size_t decide_propagation_size= custom_propagation_size > 0 ? custom_propagation_size : current_bufferSize;
         buffers.push_back(
-            std::make_unique<Buffer<T>>(current_bufferSize));
-        sizes.push_back(current_bufferSize);
+            std::make_unique<Buffer<T>>(decide_propagation_size));
+        sizes.push_back(decide_propagation_size);
         current_index = 0;
     }
 
