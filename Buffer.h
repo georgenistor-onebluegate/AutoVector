@@ -1,6 +1,3 @@
-//
-// Created by george on 26.10.2026.
-//
 #ifndef BUFFER_H
 #define BUFFER_H
 
@@ -10,6 +7,7 @@
 template <typename T>
 class Buffer
 {
+private:
     std::size_t bufferSize;
     std::unique_ptr<T[]> data;
 
@@ -24,6 +22,4 @@ public:
 
 #include "Buffer.tpp"
 
-#endif
-
-
+#endif // BUFFER_H

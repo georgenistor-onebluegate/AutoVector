@@ -1,35 +1,47 @@
-//
-// Created by george on 26.10.2026.
-//
 #ifndef AUTOVECTOR_H
 #define AUTOVECTOR_H
+
 #include <cstddef>
-#include <iterator>
 #include <list>
+#include <iterator>
+#include <memory>
+
 #include "Buffer.h"
 
 template <typename T>
 class AutoVector
 {
-    std::list<Buffer<T>> buffers;
-    std::size_t current_bufferSize, size_propagation;
+private:
+    std::list<std::unique_ptr<Buffer<T>>> buffers;
+
+    // Sizes of each allocated buffer, in the same order as buffers.
     std::list<std::size_t> sizes;
 
+    std::size_t current_bufferSize;
+    std::size_t size_propagation;
     std::size_t current_index;
+    std::size_t elements_total;
     bool singleBuffer;
 
 public:
     AutoVector();
+    ~AutoVector() = default;
 
-    ~AutoVector();
-
+    // Create the first buffer. Calling Initialize again resets the contents.
     void Initialize(std::size_t size);
+
+    // Add a new buffer. If this is the first propagation, buffer_size
+    // is added to the initial size; subsequent buffers use the current size.
     void Propagate(std::size_t buffer_size);
-    void Add(T element);
+
+    // Append an element to the AutoVector.
+    void Add(const T& element);
+
     void addBuffer();
 
     std::size_t bufferCount() const;
     std::size_t getBufferSize() const;
+    std::size_t size() const;
 
     void Display() const;
 
@@ -39,4 +51,4 @@ public:
 
 #include "AutoVector.tpp"
 
-#endif
+#endif // AUTOVECTOR_H

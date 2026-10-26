@@ -1,25 +1,38 @@
-//
-// Created by george on 26.10.2026.
-//
+#ifndef AUTOVECTOR_TPP
+#define AUTOVECTOR_TPP
+
+#include <iostream>
+#include <stdexcept>
+#include <utility>
 
 template <typename T>
 AutoVector<T>::AutoVector()
     : current_bufferSize(0),
       size_propagation(0),
       current_index(0),
+      elements_total(0),
       singleBuffer(true)
 {
 }
 
 template <typename T>
-AutoVector<T>::~AutoVector() = default;
-
-template <typename T>
 void AutoVector<T>::Initialize(std::size_t size)
 {
-    current_bufferSize = size;
+    buffers.clear();
+    sizes.clear();
 
-    buffers.emplace_back(size);
+    current_bufferSize = size;
+    current_index = 0;
+    elements_total = 0;
+    size_propagation = 0;
+    singleBuffer = true;
+
+    if (size == 0)
+    {
+        return;
+    }
+
+    buffers.push_back(std::make_unique<Buffer<T>>(size));
     sizes.push_back(size);
 }
 
@@ -30,40 +43,63 @@ void AutoVector<T>::Propagate(std::size_t buffer_size)
 
     if (singleBuffer)
     {
+        // The first additional buffer grows by buffer_size relative
+        // to the initial buffer size, matching the original intent.
         current_bufferSize += buffer_size;
         singleBuffer = false;
     }
 
-    buffers.emplace_back(current_bufferSize);
+    buffers.push_back(std::make_unique<Buffer<T>>(current_bufferSize));
     sizes.push_back(current_bufferSize);
 }
 
 template <typename T>
-void AutoVector<T>::Add(T element)
+void AutoVector<T>::Add(const T& element)
 {
-    auto it = std::prev(buffers.end());
-
-    if (current_index < current_bufferSize)
+    if (buffers.empty())
     {
-        (*it)[current_index++] = element;
+        throw std::logic_error("Call Initialize() before Add()");
     }
-    else
+
+    // The final buffer's allocated size is stored in sizes.back().
+    const std::size_t last_buffer_size = sizes.back();
+
+    if (current_index >= last_buffer_size)
     {
-        current_bufferSize += size_propagation;
+        // Keep the growth policy explicit: use the configured propagation
+        // increment. If none has been configured, use the previous buffer
+        // size so Add() can continue growing safely.
+        const std::size_t increment =
+            size_propagation != 0 ? size_propagation : last_buffer_size;
 
-        Propagate(8);
+        if (increment == 0)
+        {
+            throw std::logic_error("Cannot grow a zero-sized buffer");
+        }
 
+        current_bufferSize = last_buffer_size + increment;
+        buffers.push_back(
+            std::make_unique<Buffer<T>>(current_bufferSize));
+        sizes.push_back(current_bufferSize);
         current_index = 0;
-
-        it = std::prev(buffers.end());
-        (*it)[current_index++] = element;
     }
+
+    (*buffers.back())[current_index] = element;
+    ++current_index;
+    ++elements_total;
 }
 
 template <typename T>
 void AutoVector<T>::addBuffer()
 {
-    buffers.emplace_back(current_bufferSize);
+    if (current_bufferSize == 0)
+    {
+        throw std::logic_error(
+            "Call Initialize() with a non-zero size before addBuffer()");
+    }
+
+    buffers.push_back(
+        std::make_unique<Buffer<T>>(current_bufferSize));
     sizes.push_back(current_bufferSize);
 }
 
@@ -80,12 +116,21 @@ std::size_t AutoVector<T>::getBufferSize() const
 }
 
 template <typename T>
+std::size_t AutoVector<T>::size() const
+{
+    return elements_total;
+}
+
+
+template <typename T>
 void AutoVector<T>::Display() const
 {
     std::size_t bufferIndex = 0;
 
-    for (const auto& buffer : buffers)
+    for (const auto& bufferPtr : buffers)
     {
+        const Buffer<T>& buffer = *bufferPtr;
+
         std::cout << "Buffer " << bufferIndex << ": ";
 
         for (std::size_t i = 0; i < buffer.size(); ++i)
@@ -98,19 +143,30 @@ void AutoVector<T>::Display() const
     }
 }
 
+
 template <typename T>
 T& AutoVector<T>::operator[](std::size_t index)
 {
+    if (index >= elements_total)
+    {
+        throw std::out_of_range("AutoVector index out of range");
+    }
+
     std::size_t offset = 0;
 
-    for (auto& buffer : buffers)
+    for (std::size_t i = 0; i < buffers.size(); ++i)
     {
-        if (index - offset < buffer.size())
+        const std::size_t buffer_size = *std::next(sizes.begin(),
+            static_cast<std::ptrdiff_t>(i));
+
+        if (index - offset < buffer_size)
         {
-            return buffer[index - offset];
+            auto it = std::next(buffers.begin(),
+                static_cast<std::ptrdiff_t>(i));
+            return (**it)[index - offset];
         }
 
-        offset += buffer.size();
+        offset += buffer_size;
     }
 
     throw std::out_of_range("AutoVector index out of range");
@@ -119,17 +175,27 @@ T& AutoVector<T>::operator[](std::size_t index)
 template <typename T>
 const T& AutoVector<T>::operator[](std::size_t index) const
 {
-    std::size_t offset = 0;
-
-    for (const auto& buffer : buffers)
+    if (index >= elements_total)
     {
-        if (index >= offset && index - offset < buffer.size())
+        throw std::out_of_range("AutoVector index out of range");
+    }
+
+    std::size_t offset = 0;
+    auto sizeIt = sizes.begin();
+
+    for (auto it = buffers.begin(); it != buffers.end(); ++it, ++sizeIt)
+    {
+        const std::size_t buffer_size = *sizeIt;
+
+        if (index - offset < buffer_size)
         {
-            return buffer[index - offset];
+            return (**it)[index - offset];
         }
 
-        offset += buffer.size();
+        offset += buffer_size;
     }
 
     throw std::out_of_range("AutoVector index out of range");
 }
+
+#endif // AUTOVECTOR_TPP

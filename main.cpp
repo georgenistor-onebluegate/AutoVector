@@ -1,11 +1,10 @@
 #include <iostream>
+
 #include "AutoVector.h"
-using namespace std;
 
-
-int main() {
-
-    AutoVector<int> av;  // Each buffer contains 1024 integers
+int main()
+{
+    AutoVector<int> av;
     av.Initialize(6);
 
     av.Add(0);
@@ -62,12 +61,16 @@ int main() {
     av.Add(51);
     av.Add(52);
     av.Add(53);
+    av.Add(54);
+    av.Add(55);
 
-    av[54]=54;
-    av[55]=55;
-    av[56]=56;
+    av[55] = 99;
+
+
+    std::cout << "Element count: " << av.size() << '\n';
+    std::cout << "Buffer count: " << av.bufferCount() << '\n';
+    std::cout << "Element at index 6: " << av[6] << "\n\n";
 
     av.Display();
-
     return 0;
 }
