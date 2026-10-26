@@ -24,7 +24,7 @@ void AutoVector<T>::Initialize(std::size_t size)
     current_bufferSize = size;
     current_index = 0;
     elements_total = 0;
-    size_propagation = 4;
+    size_propagation = 5;
     singleBuffer = true;
 
     if (size == 0)

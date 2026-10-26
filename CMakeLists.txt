@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 3.0)
-project(AutoVector)
+cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 20)
+project(AutoVector LANGUAGES CXX)
 
-add_executable(AutoVector main.cpp
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_executable(AutoVector
         main.cpp
-        Buffer.h
-        Buffer.tpp
-        AutoVector.h
-        AutoVector.tpp
 )
