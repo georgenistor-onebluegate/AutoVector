@@ -1,8 +1,8 @@
 //
 // Created by george on 26.10.2026.
 //
-
-#pragma once
+#ifndef AUTOVECTOR_H
+#define AUTOVECTOR_H
 #include <cstddef>
 #include <iterator>
 #include <list>
@@ -38,3 +38,5 @@ public:
 };
 
 #include "AutoVector.tpp"
+
+#endif

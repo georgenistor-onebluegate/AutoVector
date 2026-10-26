@@ -1,8 +1,8 @@
 //
 // Created by george on 26.10.2026.
 //
-#pragma once
-
+#ifndef BUFFER_H
+#define BUFFER_H
 
 #include <cstddef>
 #include <memory>
@@ -24,6 +24,6 @@ public:
 
 #include "Buffer.tpp"
 
-
+#endif
 
 
