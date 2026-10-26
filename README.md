@@ -1,4 +1,4 @@
-# AutoVector - no resizing
+# Dynamic AutoVector - no resizing
 **Author:** George Nistor  
 **Version:** 1.0
 
