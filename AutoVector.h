@@ -30,10 +30,6 @@ public:
     // Create the first buffer. Calling Initialize again resets the contents.
     void Initialize(std::size_t size);
 
-    // Add a new buffer. If this is the first propagation, buffer_size
-    // is added to the initial size; subsequent buffers use the current size.
-    void Propagate(std::size_t buffer_size);
-
     // Append an element to the AutoVector.
     void Add(const T& element);
 

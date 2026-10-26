@@ -24,7 +24,7 @@ void AutoVector<T>::Initialize(std::size_t size)
     current_bufferSize = size;
     current_index = 0;
     elements_total = 0;
-    size_propagation = 0;
+    size_propagation = 4;
     singleBuffer = true;
 
     if (size == 0)
@@ -34,23 +34,6 @@ void AutoVector<T>::Initialize(std::size_t size)
 
     buffers.push_back(std::make_unique<Buffer<T>>(size));
     sizes.push_back(size);
-}
-
-template <typename T>
-void AutoVector<T>::Propagate(std::size_t buffer_size)
-{
-    size_propagation = buffer_size;
-
-    if (singleBuffer)
-    {
-        // The first additional buffer grows by buffer_size relative
-        // to the initial buffer size, matching the original intent.
-        current_bufferSize += buffer_size;
-        singleBuffer = false;
-    }
-
-    buffers.push_back(std::make_unique<Buffer<T>>(current_bufferSize));
-    sizes.push_back(current_bufferSize);
 }
 
 template <typename T>

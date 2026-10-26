@@ -69,7 +69,7 @@ int main()
 
     std::cout << "Element count: " << av.size() << '\n';
     std::cout << "Buffer count: " << av.bufferCount() << '\n';
-    std::cout << "Element at index 6: " << av[6] << "\n\n";
+    std::cout << "Element at index 55: " << av[55] << "\n\n";
 
     av.Display();
     return 0;
